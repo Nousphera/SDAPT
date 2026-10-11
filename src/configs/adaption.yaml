@@ -1,0 +1,169 @@
+# Canonical adaptation config for DAPT, FSL, FSL-518, and MoCo-SFL.
+# Paths are relative to the repository root unless an environment variable is used.
+# Uncomment one profile override below when switching adaptation modes.
+
+# ---------------- shared data paths ----------------
+dataset_paths:
+  chexpert_train_labels: dataman/impression_fixed_train.json
+  chexpert_train_images: ${TMPDIR}
+  chexpert_test_labels: datasets/chexlocalize_dataset/chexlocalize/CheXpert/test_labels.csv
+  chexpert_test_images: datasets/chexlocalize_dataset/chexlocalize/CheXpert
+  hpa_images: ${HPA_ROOT}
+  hpa_manifest: ${HPA_ROOT}/manifest
+  quickdraw_images: ${DOMAINNET_ROOT}
+  quickdraw_train_manifest: ${DOMAINNET_ROOT}/quickdraw_train.txt
+  quickdraw_test_manifest: ${DOMAINNET_ROOT}/quickdraw_test.txt
+  sketch_images: ${DOMAINNET_ROOT}
+  sketch_train_manifest: ${DOMAINNET_ROOT}/sketch_train.txt
+  sketch_test_manifest: ${DOMAINNET_ROOT}/sketch_test.txt
+  wilds_root: ${WILDS_ROOT}
+  bdd_root: datasets/BDD
+
+# ---------------- active default: DAPT ----------------
+dataset: fmow
+partitioner: dirichlet
+alpha: 10000
+model: dino_vit_base
+checkpoint_key: model
+pretrained_weight_path: checkpoints/dinov2_vitb14_pretrain.pth
+OFFICIAL_EPOCH_LENGTH: 250
+eval_epoch: 10
+nr_of_epochs: 100
+nr_of_clients: 10
+dataset_split_type: noniid
+batch_size: 15
+random_seed: 2024
+small_test_run: false
+ibot_use: true
+transforms: ""
+n_local_crops: 8
+test_num_workers: 4
+img_size: 224
+patch_size: 14
+n_tokens: 256
+embed_dim: 768
+depth: 12
+num_heads: 12
+mlp_ratio: 4
+init_values: 1.0e-05
+num_workers: 4
+gpu_id: 0
+split_layer: 0
+fusion_type: default
+use_lora: true
+lora_alpha: 32
+
+optim:
+  epochs: 100
+  weight_decay: 0.0
+  weight_decay_end: 0.0
+  base_lr: 0.001
+  lr: 0.001
+  warmup_epochs: 1
+  min_lr: 1.0e-6
+  clip_grad: 3.0
+  freeze_last_layer_epochs: 2
+  scaling_rule: sqrt_wrt_1024
+  patch_embed_lr_mult: 0.2
+  layerwise_decay: 1.0
+  adamw_beta1: 0.9
+  adamw_beta2: 0.999
+  accum_iter: 7
+
+fed:
+  local_iters: 50
+  server_opt: adagrad
+  server_lr: 1.0e-2
+  tau: 1.0e-3
+  server_beta1: 0.0
+  server_beta2: 0.99
+  reset_local_opt: true
+  momentum_by_round: false
+  debug_key: null
+
+train:
+  centering: sinkhorn_knopp
+  OFFICIAL_EPOCH_LENGTH: 250
+
+teacher:
+  momentum_teacher: 0.994
+  final_momentum_teacher: 1.0
+  warmup_teacher_temp: 0.04
+  teacher_temp: 0.07
+  warmup_teacher_temp_epochs: 30
+
+dino:
+  loss_weight: 1.0
+  koleo_loss_weight: 0.1
+  head_n_prototypes: 65536
+  head_hidden_dim: 2048
+  head_bottleneck_dim: 256
+  head_nlayers: 3
+
+ibot:
+  loss_weight: 1.0
+  mask_sample_probability: 0.5
+  mask_ratio_min_max: [0.1, 0.5]
+  separate_head: false
+  head_n_prototypes: 65536
+  head_hidden_dim: 2048
+  head_bottleneck_dim: 256
+  head_nlayers: 3
+
+lora:
+  type: lora
+  rank: 64
+  layers: [attn]
+  unfreeze_blocks: [11]
+  unfreeze_embed: false
+  unfreeze_cls_token: true
+  unfreeze_norm: true
+  attn_key: false
+  attn_proj: false
+
+# ---------------- profile overrides ----------------
+# MoCo-SFL: uncomment this whole block, then run mocosfl_adaption_main.py.
+# dataset: fmow
+# partitioner: dirichlet
+# nr_of_clients: 4
+# batch_size: 8
+# img_size: 224
+# patch_size: 16
+# in_chans: 3
+# embed_dim: 768
+# moco_checkpoint_path: checkpoints/vit-b-300ep.pth.tar
+# moco_config:
+#   moco:
+#     out_dim: 256
+#     hidden_dim: 4096
+#     pred_hidden_dim: 4096
+#     proj_nlayers: 3
+#     pred_nlayers: 2
+#     temperature: 0.2
+#     queue_size: 16384
+#     base_momentum: 0.99
+#     symmetric_loss: true
+#     use_in_batch_negatives: true
+#     freeze_patch_embed: true
+
+# FSL: uncomment these overrides for the standard 224px federated split setup.
+# dataset: CheXpert
+# partitioner: dirichlet
+# img_size: 224
+# batch_size: 85
+# nr_of_clients: 10
+# local_iters: 50
+# max_shots: 25
+
+# FSL-518: uncomment these overrides for the 518px setup.
+# dataset: CheXpert
+# partitioner: random
+# img_size: 518
+# n_tokens: 1369
+# batch_size: 40
+# nr_of_clients: 5
+# local_iters: 100
+# max_shots: 25
+# OFFICIAL_EPOCH_LENGTH: 500
+# train:
+#   OFFICIAL_EPOCH_LENGTH: 500
