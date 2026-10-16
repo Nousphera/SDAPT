@@ -1,0 +1,10 @@
+torch==2.8.0
+torchvision==0.23.0
+timm==1.0.22
+numpy>=2.2,<3
+scikit-learn>=1.6,<1.8
+Pillow>=11,<13
+safetensors>=0.6,<1
+tqdm>=4.67,<5
+pytest>=8,<10
+-e .
