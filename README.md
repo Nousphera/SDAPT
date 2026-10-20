@@ -1,6 +1,7 @@
 <h1 align="center">SDAPT</h1>
 <p align="center"><strong>Domain Adaptive Pretraining in Split Learning<br>for Vision Foundation Models</strong></p>
 <p align="center">Stan van Honk · <a href="https://vtsouval.github.io/"><strong>Vasileios Tsouvalas</strong></a> · Nirvana Meratnia</p>
+<p align="center"><a href="https://nousphera.github.io/SDAPT/"><strong>Project Page ↗</strong></a></p>
 
 ## Abstract
 
